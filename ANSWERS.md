@@ -4,9 +4,24 @@
 
 ### 2. The database question
 
+Here's the schema in SQL (tested in Postgres):
 
+And here's the query:
 
-### 3. Frontops question
+```sql
+SELECT cars.id, owner, metadata, bookings.rental_period
+	FROM public.cars cars, public.bookings bookings
+	WHERE cars.id = bookings.car
+    AND NOT bookings.rental_period && '[2021-01-04, 2021-02-01]'
+```
+
+Few "why" answers:
+
+1. Relational database is clearly the right tool for this job. We have entities, we have relations, no need to overthink.
+2. Date range rather than `start_date` and `end_date` - if the frontend would ever need to show an availability calendar, it wouldn't be a problem to parse this; otherwise, it's possible to build index from this, plus there are nice containment operators (instead of writing complicated queries with multiple conditions)
+3. User's have a role which are enums; perhaps someone could be both borrower and lender, but for simplification (just like everything in this task, it's greeeaaatly simplified) I decided to make it an enum.
+
+### 3. The Frontops question
 
 There are many ways to do it, and it mostly depends on time/effort/expected results. The one below is pretty elastic.
 
@@ -32,6 +47,8 @@ export default {
     "api_url": process.env.REACT_APP_BASE_API_URL || "http://localhost:3000/"
 }
 ```
+
+with some nice defaults for development.
 
 2. Copy the build, copy the nginx config which would definitely exist in real life scenario
 3. Expose chosen port
