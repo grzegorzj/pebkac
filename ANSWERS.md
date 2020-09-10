@@ -6,6 +6,45 @@
 
 Here's the schema in SQL (tested in Postgres):
 
+```sql
+CREATE TYPE public.role AS ENUM
+    ('borrower', 'lender');
+
+CREATE TABLE public.bookings
+(
+    rental_period daterange,
+    borrower uuid,
+    car uuid,
+    id uuid,
+    CONSTRAINT borrower FOREIGN KEY (borrower)
+        REFERENCES public.users (id) MATCH SIMPLE
+        ON UPDATE NO ACTION
+        ON DELETE NO ACTION
+)
+
+CREATE TABLE public.cars
+(
+    id uuid NOT NULL,
+    owner uuid,
+    metadata jsonb,
+    CONSTRAINT cars_pkey PRIMARY KEY (id),
+    CONSTRAINT car_owner FOREIGN KEY (owner)
+        REFERENCES public.users (id) MATCH SIMPLE
+        ON UPDATE NO ACTION
+        ON DELETE NO ACTION
+)
+
+CREATE TABLE public.users
+(
+    id uuid NOT NULL,
+    role role NOT NULL,
+    metadata jsonb,
+    CONSTRAINT users_pkey PRIMARY KEY (id)
+)
+
+
+```
+
 And here's the query:
 
 ```sql
